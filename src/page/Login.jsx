@@ -135,7 +135,7 @@ function Login({ setPage, setTempEmail }) {
         localStorage.setItem("Role", response.data.user.role);
         alert("User Verified! You are now logged in.");
         // Redirect to the home page after verification
-        window.location.href = "/";
+        window.location.href = "/dashboard";
       }
     } catch (err) {
       setError("Invalid login credentials");

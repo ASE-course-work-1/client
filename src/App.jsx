@@ -6,6 +6,9 @@ import Login from './page/Login';
 import Dashboard from './page/Dashboard';
 import OutDash from './page/OutletDashboard';
 import AdminPanel from './page/AdminPanel';
+import OrderTracking from './page/OrderTracking;';
+import CreateOrder from './page/CreateOrder';
+
 
 function App() {
   return (
@@ -14,8 +17,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/outdash" element={<OutDash />} />
+        <Route path="/outlet" element={<OutDash />} />
         <Route path="/adminpanel" element={<AdminPanel />} />
+        <Route path="/ordertracking" element={<OrderTracking />} />
+        <Route path="/createorder" element={<CreateOrder />} />
       </Routes>
     </div>
   );

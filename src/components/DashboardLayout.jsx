@@ -26,6 +26,18 @@ const DashboardLayout = ({ title, children }) => {
                         </li>
                         <li>
                             <NavLink
+                                to="/createorder"
+                                className={({ isActive }) =>
+                                    isActive
+                                        ? "block px-4 py-2 rounded bg-blue-600"
+                                        : "block px-4 py-2 rounded hover:bg-blue-700"
+                                }
+                            >
+                                Create Order
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
                                 to="/ordertracking"
                                 className={({ isActive }) =>
                                     isActive

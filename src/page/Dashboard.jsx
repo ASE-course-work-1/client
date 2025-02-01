@@ -1,76 +1,121 @@
-// src/components/DashboardLayout.jsx
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import DashboardLayout from "../components/DashboardLayout";
+import axios from "axios";
+import { Line } from "react-chartjs-2";
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from "chart.js";
 
-const DashboardLayout = ({ title, children }) => {
+// Registering Chart.js components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+const Dashboard = ({ userRole }) => {
+    const [stats, setStats] = useState({
+        orders: 0,
+        pendingDeliveries: 0,
+        outlets: 0,
+        stock: 0,
+    });
+    const [chartData, setChartData] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [role, setRole] = useState(userRole || localStorage.getItem("Role"));
+
+    useEffect(() => {
+        if (!role) return; // Don't make an API call if the role is missing
+
+        // Dummy API call simulation with axios
+        axios.get(`/api/dashboard-stats?role=${role}`)
+            .then((response) => {
+                // Simulate stats data based on user role
+                const responseData = response.data || {
+                    orders: 120,
+                    pendingDeliveries: 40,
+                    outlets: 10,
+                    stock: 200,
+                    dailyOrders: [10, 20, 15, 30, 50, 60, 80], // Dummy data for the chart
+                };
+
+                setStats(responseData);
+
+                // Chart data simulation (daily orders for the past week)
+                setChartData({
+                    labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                    datasets: [
+                        {
+                            label: "Orders this week",
+                            data: responseData.dailyOrders,
+                            borderColor: "rgb(75, 192, 192)",
+                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                            fill: true,
+                        },
+                    ],
+                });
+
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("Error fetching stats", error);
+                setLoading(false);
+            });
+    }, [role]);
+
+    if (loading) {
+        return <DashboardLayout title="Dashboard"><p>Loading...</p></DashboardLayout>;
+    }
+
     return (
-        <div className="min-h-screen flex bg-gray-100">
-            {/* Sidebar */}
-            <aside className="w-64 bg-blue-800 text-white p-6">
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold">GasByGas Dashboard</h1>
-                </div>
-                <nav>
-                    <ul className="space-y-4">
-                        <li>
-                            <NavLink
-                                to="/dashboard"
-                                className={({ isActive }) =>
-                                    isActive
-                                        ? "block px-4 py-2 rounded bg-blue-600"
-                                        : "block px-4 py-2 rounded hover:bg-blue-700"
-                                }
-                            >
-                                Dashboard Home
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/ordertracking"
-                                className={({ isActive }) =>
-                                    isActive
-                                        ? "block px-4 py-2 rounded bg-blue-600"
-                                        : "block px-4 py-2 rounded hover:bg-blue-700"
-                                }
-                            >
-                                Order Tracking
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/adminpanel"
-                                className={({ isActive }) =>
-                                    isActive
-                                        ? "block px-4 py-2 rounded bg-blue-600"
-                                        : "block px-4 py-2 rounded hover:bg-blue-700"
-                                }
-                            >
-                                Admin Panel
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/outlet"
-                                className={({ isActive }) =>
-                                    isActive
-                                        ? "block px-4 py-2 rounded bg-blue-600"
-                                        : "block px-4 py-2 rounded hover:bg-blue-700"
-                                }
-                            >
-                                Outlet Dashboard
-                            </NavLink>
-                        </li>
-                        {/* Add more navigation links as needed */}
-                    </ul>
-                </nav>
-            </aside>
-            {/* Main Content */}
-            <main className="flex-1 p-8">
-                <h2 className="text-3xl font-bold mb-4">{title}</h2>
-                {children}
-            </main>
-        </div>
+        <DashboardLayout title="Dashboard">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {role === "consumer" && (
+                    <div className="bg-white p-6 shadow-md rounded">
+                        <h3 className="text-xl font-bold">Your Orders</h3>
+                        <p className="text-3xl">{stats.orders}</p>
+                    </div>
+                )}
+
+                {role === "outlet_manager" && (
+                    <>
+                        <div className="bg-white p-6 shadow-md rounded">
+                            <h3 className="text-xl font-bold">Pending Deliveries</h3>
+                            <p className="text-3xl">{stats.pendingDeliveries}</p>
+                        </div>
+                        <div className="bg-white p-6 shadow-md rounded">
+                            <h3 className="text-xl font-bold">Stock Available</h3>
+                            <p className="text-3xl">{stats.stock}</p>
+                        </div>
+                    </>
+                )}
+
+                {role === "admin" && (
+                    <>
+                        <div className="bg-white p-6 shadow-md rounded">
+                            <h3 className="text-xl font-bold">Total Outlets</h3>
+                            <p className="text-3xl">{stats.outlets}</p>
+                        </div>
+                        <div className="bg-white p-6 shadow-md rounded">
+                            <h3 className="text-xl font-bold">Stock Across Outlets</h3>
+                            <p className="text-3xl">{stats.stock}</p>
+                        </div>
+                    </>
+                )}
+
+                {/* Chart for Admins or any role that needs it */}
+                {role === "admin" && (
+                    <div className="bg-white p-6 shadow-md rounded col-span-3">
+                        <h3 className="text-xl font-bold">Weekly Orders Trend</h3>
+                        <Line data={chartData} options={{ responsive: true }} />
+                    </div>
+                )}
+            </div>
+        </DashboardLayout>
     );
 };
 
-export default DashboardLayout;
+export default Dashboard;
