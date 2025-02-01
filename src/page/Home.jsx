@@ -6,9 +6,9 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <div>
+    <div className="relative">
       {/* Navbar */}
-      <nav className="fixed top-5 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[1200px] p-4 bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg z-50 rounded-full">
+      <nav className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-[1200px] p-4 bg-gradient-to-r from-blue-800 via-indigo-700 to-blue-900 text-white shadow-2xl rounded-full">
         <div className="flex justify-center space-x-8">
           <a
             href="#hero"
@@ -16,7 +16,6 @@ export default function Home() {
           >
             Home
           </a>
-
           <a
             href="#products"
             className="px-6 py-2 bg-gray-700 rounded-full transition duration-300 hover:bg-indigo-400 hover:scale-105 focus:outline-none"
@@ -36,7 +35,7 @@ export default function Home() {
             Contact
           </a>
           <Link
-            to="/Login"
+            to="/login"
             className="px-6 py-2 bg-gray-700 rounded-full transition duration-300 hover:bg-indigo-400 hover:scale-105 focus:outline-none"
           >
             Login
@@ -44,17 +43,17 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Sections */}
-      <div id="hero">
+      {/* Sections with top padding to avoid navbar overlap */}
+      <div id="hero" className="pt-24">
         <HeroSection />
       </div>
-      <div id="products">
+      <div id="products" className="pt-24">
         <ProductSection />
       </div>
-      <div id="outlets">
+      <div id="outlets" className="pt-24">
         <OutletSection />
       </div>
-      <div id="contact">
+      <div id="contact" className="pt-24">
         <ContactSection />
       </div>
     </div>

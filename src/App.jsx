@@ -1,30 +1,24 @@
-
-
-import './App.css'
-
+// App.jsx
+import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import Home from './page/Home';
 import Login from './page/Login';
+import Dashboard from './page/Dashboard';
+import OutDash from './page/OutletDashboard';
+import AdminPanel from './page/AdminPanel';
 
 function App() {
-
   return (
- 
     <div>
-    {/* <nav>
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/about">About</Link></li>
-      </ul>
-    </nav> */}
-
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/Login" element={<Login />} />
-    </Routes>
-  </div>
-
-  )
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/outdash" element={<OutDash />} />
+        <Route path="/adminpanel" element={<AdminPanel />} />
+      </Routes>
+    </div>
+  );
 }
 
-export default App
+export default App;

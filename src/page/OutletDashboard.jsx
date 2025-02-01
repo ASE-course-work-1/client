@@ -1,5 +1,7 @@
+// src/page/OutletDashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import DashboardLayout from "../components/DashboardLayout";
 
 export default function OutletDashboard() {
     const [outletData, setOutletData] = useState(null);
@@ -24,8 +26,7 @@ export default function OutletDashboard() {
     }, []);
 
     return (
-        <div className="min-h-screen p-8 bg-gray-100">
-            <h1 className="text-3xl font-bold mb-4">Outlet Dashboard</h1>
+        <DashboardLayout title="Outlet Dashboard">
             {error && <p className="text-red-500 mb-4">{error}</p>}
             {outletData ? (
                 <div>
@@ -44,6 +45,6 @@ export default function OutletDashboard() {
             ) : (
                 <p>Loading outlet data...</p>
             )}
-        </div>
+        </DashboardLayout>
     );
 }

@@ -1,5 +1,7 @@
+// src/page/AdminPanel.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import DashboardLayout from "../components/DashboardLayout";
 
 export default function AdminPanel() {
     const [users, setUsers] = useState([]);
@@ -24,8 +26,7 @@ export default function AdminPanel() {
     }, []);
 
     return (
-        <div className="min-h-screen p-8 bg-gray-100">
-            <h1 className="text-3xl font-bold mb-4">Admin Panel</h1>
+        <DashboardLayout title="Admin Panel">
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <p>Manage users, orders, and system settings from here.</p>
             <div className="mt-8">
@@ -50,6 +51,6 @@ export default function AdminPanel() {
                     </ul>
                 )}
             </div>
-        </div>
+        </DashboardLayout>
     );
 }
