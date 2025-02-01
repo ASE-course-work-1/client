@@ -34,7 +34,7 @@ function Register({ setPage, setTempEmail }) {
   const [email, setEmail] = useState("");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
-  const [accountType, setAccountType] = useState("Individual");
+  const [account_type, setAccountType] = useState("Individual");
   const [error, setError] = useState("");
 
   const handleRegister = async () => {
@@ -44,7 +44,7 @@ function Register({ setPage, setTempEmail }) {
         email,
         contact,
         password,
-        accountType,
+        account_type,
         role: "Consumer",
       });
       if (response.data.message) {
@@ -90,7 +90,7 @@ function Register({ setPage, setTempEmail }) {
       />
       <select
         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        value={accountType}
+        value={account_type}
         onChange={(e) => setAccountType(e.target.value)}
       >
         <option value="Individual">Individual</option>
@@ -130,9 +130,9 @@ function Login({ setPage, setTempEmail }) {
       });
       if (response.data.message) {
         localStorage.setItem("authToken", response.data.token);
-        localStorage.setItem("Userid", response.data.id);
-        localStorage.setItem("Email", response.data.email);
-        localStorage.setItem("Role", response.data.role);
+        localStorage.setItem("Userid", response.data.user.id);
+        localStorage.setItem("Email", response.data.user.email);
+        localStorage.setItem("Role", response.data.user.role);
         alert("User Verified! You are now logged in.");
         // Redirect to the home page after verification
         window.location.href = "/";
