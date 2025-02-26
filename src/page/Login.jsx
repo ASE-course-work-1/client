@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 export default function AuthPages() {
   // "register", "login", "otp" are the possible pages
@@ -20,9 +21,11 @@ export default function AuthPages() {
           <Register setPage={setPage} setTempEmail={setTempEmail} />
         )}
         {page === "login" && (
-          <Login setPage={setPage} setTempEmail={setTempEmail} />
+          <Login setPage={setPage} />
         )}
-        {page === "otp" && <OTPVerification setPage={setPage} tempEmail={tempEmail} />}
+        {page === "otp" && (
+          <OTPVerification tempEmail={tempEmail} />
+        )}
       </motion.div>
     </div>
   );
@@ -32,27 +35,31 @@ export default function AuthPages() {
 function Register({ setPage, setTempEmail }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [contact, setContact] = useState("");
+  const [phone, setPhone] = useState("");
+  const [nic, setNic] = useState("");
   const [password, setPassword] = useState("");
-  const [account_type, setAccountType] = useState("Individual");
   const [error, setError] = useState("");
 
   const handleRegister = async () => {
+    setError("");
     try {
-      const response = await axios.post("http://localhost:5001/api/v1/register", {
+      const response = await axios.post("http://localhost:5003/api/auth/register", {
         name,
         email,
-        contact,
         password,
-        account_type,
-        role: "Consumer",
+        phone,
+        nic,
+        role: "consumer",
       });
+      // Assuming a success message indicates registration success
       if (response.data.message) {
         setTempEmail(email);
         setPage("otp");
+      } else {
+        setError(response.data.message || "Registration failed. Please try again.");
       }
-    } catch (err) {
-      setError("Registration failed. Please try again.");
+    } catch (error) {
+      setError(error.response?.data?.message || "Registration failed. Please try again.");
     }
   };
 
@@ -78,8 +85,15 @@ function Register({ setPage, setTempEmail }) {
         type="text"
         placeholder="Contact"
         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        value={contact}
-        onChange={(e) => setContact(e.target.value)}
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="NIC"
+        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        value={nic}
+        onChange={(e) => setNic(e.target.value)}
       />
       <input
         type="password"
@@ -88,14 +102,6 @@ function Register({ setPage, setTempEmail }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <select
-        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        value={account_type}
-        onChange={(e) => setAccountType(e.target.value)}
-      >
-        <option value="Individual">Individual</option>
-        <option value="Business">Business</option>
-      </select>
       <button
         className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-300"
         onClick={handleRegister}
@@ -103,7 +109,7 @@ function Register({ setPage, setTempEmail }) {
         Create Account
       </button>
       <p className="text-center text-sm">
-        Already have an account? {" "}
+        Already have an account?{" "}
         <span
           className="text-blue-500 cursor-pointer"
           onClick={() => setPage("login")}
@@ -115,40 +121,44 @@ function Register({ setPage, setTempEmail }) {
   );
 }
 
+Register.propTypes = {
+  setPage: PropTypes.func.isRequired,
+  setTempEmail: PropTypes.func.isRequired,
+};
+
 // Login Page
-function Login({ setPage, setTempEmail }) {
+function Login({ setPage }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    setError("");
     try {
-      // Call your login API endpoint which sends an OTP
-      const response = await axios.post("http://localhost:5001/api/v1/login", {
+      const response = await axios.post("http://localhost:5003/api/auth/login", {
         email,
         password,
       });
-      if (response.data.message) {
+      if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         localStorage.setItem("Userid", response.data.user.id);
         localStorage.setItem("Email", response.data.user.email);
         localStorage.setItem("Role", response.data.user.role);
         alert("User Verified! You are now logged in.");
-        // Redirect to the home page after verification
         window.location.href = "/dashboard";
+      } else {
+        setError(response.data.message || "Invalid login credentials");
       }
-    } catch (err) {
-      setError("Invalid login credentials");
+    } catch (error) {
+      setError(error.response?.data?.message || "Invalid login credentials");
     }
   };
 
-  // Bypass login for testing purposes with dummy details
+  // Bypass login for testing purposes
   const handleBypassLogin = () => {
     const dummyToken = "dummy-auth-token";
     localStorage.setItem("authToken", dummyToken);
     alert("Bypass Login Successful! Redirecting to Home...");
-    // Redirect to the home page
-    //setPage("AdminPanel");
     window.location.href = "/outdash";
   };
 
@@ -183,7 +193,7 @@ function Login({ setPage, setTempEmail }) {
         Test Login (Bypass)
       </button>
       <p className="text-center text-sm">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <span
           className="text-blue-500 cursor-pointer"
           onClick={() => setPage("register")}
@@ -195,29 +205,31 @@ function Login({ setPage, setTempEmail }) {
   );
 }
 
+Login.propTypes = {
+  setPage: PropTypes.func.isRequired,
+};
+
 // OTP Verification Page
-function OTPVerification({ setPage, tempEmail }) {
+function OTPVerification({ tempEmail }) {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
 
   const handleVerify = async () => {
+    setError("");
     try {
-      // Call your OTP verification API endpoint
-      const response = await axios.post("http://localhost:5001/api/v1/verify-otp", {
+      const response = await axios.post("http://localhost:5003/api/auth/verify-identity", {
         email: tempEmail,
         otp,
       });
       if (response.data.token) {
-        // Save the authentication token in localStorage
         localStorage.setItem("authToken", response.data.token);
         alert("OTP Verified! You are now logged in.");
-        // Redirect to the home page after verification
         window.location.href = "/";
       } else {
-        setError("OTP Verification failed. Please try again.");
+        setError(response.data.message || "OTP Verification failed. Please try again.");
       }
-    } catch (err) {
-      setError("OTP Verification failed. Please try again.");
+    } catch (error) {
+      setError(error.response?.data?.message || "OTP Verification failed. Please try again.");
     }
   };
 
@@ -241,3 +253,7 @@ function OTPVerification({ setPage, tempEmail }) {
     </div>
   );
 }
+
+OTPVerification.propTypes = {
+  tempEmail: PropTypes.string.isRequired,
+};

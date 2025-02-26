@@ -4,31 +4,39 @@ import DashboardLayout from "../components/DashboardLayout";
 import axios from "axios";
 
 const CreateOrder = () => {
-  const [cylinderType, setCylinderType] = useState(""); // To track cylinder type input
+  const [outletId, setOutletId] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   // Handle form submission
   const handleCreateOrder = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+    e.preventDefault();
     setIsLoading(true);
-    setError(""); // Clear any previous errors
-    setSuccess(""); // Clear previous success messages
+    setError("");
+    setSuccess("");
 
     try {
-      // Replace with your backend API URL
-      const response = await axios.post('/api/gas-requests', {
-        cylinderType: cylinderType,
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`, // Assuming token is stored in localStorage
+      const response = await axios.post(
+        "/api/requests",
+        {
+          outletId,
+          quantity,
+          address,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
         }
-      });
+      );
 
-      // Success message
       setSuccess("Order created successfully!");
-      setCylinderType(""); // Reset the form
+      setOutletId("");
+      setQuantity(1);
+      setAddress("");
     } catch (err) {
       console.error("Error creating order:", err);
       setError("There was an error creating your order. Please try again.");
@@ -40,44 +48,55 @@ const CreateOrder = () => {
   return (
     <DashboardLayout title="Create New Order">
       <div className="container mx-auto p-6">
-        {/* <h2 className="text-2xl font-bold mb-4">Create a New Order</h2> */}
-
         {error && <div className="text-red-500 mb-4">{error}</div>}
         {success && <div className="text-green-500 mb-4">{success}</div>}
 
         <form onSubmit={handleCreateOrder} className="space-y-4">
           <div className="flex flex-col">
-            <label htmlFor="cylinderType" className="font-semibold text-lg">Cylinder Type</label>
-            <select
-              id="cylinderType"
-              name="cylinderType"
-              value={cylinderType}
-              onChange={(e) => setCylinderType(e.target.value)}
+            <label htmlFor="outletId" className="font-semibold text-lg">
+              Outlet ID
+            </label>
+            <input
+              type="text"
+              id="outletId"
+              name="outletId"
+              value={outletId}
+              onChange={(e) => setOutletId(e.target.value)}
               className="px-4 py-2 border rounded-lg"
               required
-            >
-              <option value="">Select Cylinder Type</option>
-              <option value="12.5 kg">12.5 kg</option>
-              <option value="5 kg">5 kg</option>
-              <option value="20 kg">20 kg</option>
-            </select>
+            />
           </div>
-          {/* <div className="flex flex-col">
-            <label htmlFor="selectOutlet" className="font-semibold text-lg">Select Outlet</label>
-            <select
-              id="ouletSelect"
-              name="ouletSelect"
-              value={ouletSelect}
-              onChange={(e) => setCylinderType(e.target.value)}
+
+          <div className="flex flex-col">
+            <label htmlFor="quantity" className="font-semibold text-lg">
+              Quantity
+            </label>
+            <input
+              type="number"
+              id="quantity"
+              name="quantity"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
               className="px-4 py-2 border rounded-lg"
               required
-            >
-              <option value="">Select Cylinder Type</option>
-              <option value="12.5 kg">12.5 kg</option>
-              <option value="5 kg">5 kg</option>
-              <option value="20 kg">20 kg</option>
-            </select>
-          </div> */}
+              min="1"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="address" className="font-semibold text-lg">
+              Delivery Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="px-4 py-2 border rounded-lg"
+              required
+            />
+          </div>
 
           <button
             type="submit"
