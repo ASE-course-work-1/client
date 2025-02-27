@@ -1,13 +1,13 @@
 // src/components/DashboardLayout.jsx
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const DashboardLayout = ({ title, children }) => {
   // Get the user's role from localStorage
   const role = localStorage.getItem("Role");
-  const navigate = useNavigate();
 
-  // Consumer-specific navigation
+  // Define navigation links for consumers and admins
   const consumerNavLinks =
     role === "consumer"
       ? [
@@ -17,20 +17,22 @@ const DashboardLayout = ({ title, children }) => {
         ]
       : [];
 
-  // Admin-specific navigation
   const adminNavLinks =
     role === "admin"
       ? [
-          { to: "/admin/dashboard", label: "Dashboard" },
+          { to: "/dashboard", label: "Dashboard" },
+          { to: "/adminpanel", label: "Admin Main Panel" },
           { to: "/admin/createoutlet", label: "Create Outlet" },
           { to: "/admin/createmanager", label: "Create Manager" },
           { to: "/admin/assignmanager", label: "Assign Manager" },
-          { to: "/admin/stock", label: "Manage Stock" },
+          // { to: "/admin/stock", label: "Manage Stock" },
         ]
       : [];
 
-  const navLinks = role === "consumer" ? consumerNavLinks : role === "admin" ? adminNavLinks : [];
+  const navLinks =
+    role === "consumer" ? consumerNavLinks : role === "admin" ? adminNavLinks : [];
 
+  const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
@@ -77,6 +79,11 @@ const DashboardLayout = ({ title, children }) => {
       </main>
     </div>
   );
+};
+
+DashboardLayout.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node, // 'children' can be any renderable node
 };
 
 export default DashboardLayout;
