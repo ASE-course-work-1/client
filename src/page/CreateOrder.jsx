@@ -1,5 +1,5 @@
 // src/page/CreateOrder.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import axios from "axios";
 
@@ -7,9 +7,29 @@ const CreateOrder = () => {
   const [outletId, setOutletId] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [address, setAddress] = useState("");
+  const [outlets, setOutlets] = useState([]);
+  const [loadingOutlets, setLoadingOutlets] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Fetch available outlets on component mount
+  useEffect(() => {
+    const fetchOutlets = async () => {
+      setLoadingOutlets(true);
+      try {
+        const response = await axios.get("http://localhost:5003/api/outlets/public");
+        // Assuming the API returns an array of outlet objects { id, name }
+        setOutlets(response.data);
+      } catch (err) {
+        console.error("Error fetching outlets:", err);
+      } finally {
+        setLoadingOutlets(false);
+      }
+    };
+
+    fetchOutlets();
+  }, []);
 
   // Handle form submission
   const handleCreateOrder = async (e) => {
@@ -20,7 +40,7 @@ const CreateOrder = () => {
 
     try {
       const response = await axios.post(
-        "/api/requests",
+        "http://localhost:5003/api/requests",
         {
           outletId,
           quantity,
@@ -54,17 +74,27 @@ const CreateOrder = () => {
         <form onSubmit={handleCreateOrder} className="space-y-4">
           <div className="flex flex-col">
             <label htmlFor="outletId" className="font-semibold text-lg">
-              Outlet ID
+              Select Outlet
             </label>
-            <input
-              type="text"
-              id="outletId"
-              name="outletId"
-              value={outletId}
-              onChange={(e) => setOutletId(e.target.value)}
-              className="px-4 py-2 border rounded-lg"
-              required
-            />
+            {loadingOutlets ? (
+              <p>Loading outlets...</p>
+            ) : (
+              <select
+                id="outletId"
+                name="outletId"
+                value={outletId}
+                onChange={(e) => setOutletId(e.target.value)}
+                className="px-4 py-2 border rounded-lg"
+                required
+              >
+                <option value="">Select Outlet</option>
+                {outlets.map((outlet) => (
+                  <option key={outlet.id} value={outlet.id}>
+                    {outlet.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="flex flex-col">
