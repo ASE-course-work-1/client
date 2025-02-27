@@ -19,7 +19,16 @@ const CreateOrder = () => {
       setLoadingOutlets(true);
       try {
         const response = await axios.get("http://localhost:5003/api/outlets/public");
-        // Assuming the API returns an array of outlet objects { id, name }
+        // Expected response is an array of outlet objects:
+        // [
+        //   {
+        //     "_id": "67c085eed879081f8c272b27",
+        //     "name": "Branch1",
+        //     "location": "Matara",
+        //     "district": "Matara",
+        //     "contact": "04122565689"
+        //   }
+        // ]
         setOutlets(response.data);
       } catch (err) {
         console.error("Error fetching outlets:", err);
@@ -39,6 +48,7 @@ const CreateOrder = () => {
     setSuccess("");
 
     try {
+      // Request body includes the selected outlet's _id and values from text boxes
       const response = await axios.post(
         "http://localhost:5003/api/requests",
         {
@@ -89,8 +99,8 @@ const CreateOrder = () => {
               >
                 <option value="">Select Outlet</option>
                 {outlets.map((outlet) => (
-                  <option key={outlet.id} value={outlet.id}>
-                    {outlet.name}
+                  <option key={outlet._id} value={outlet._id}>
+                    {outlet.name} - {outlet.location}
                   </option>
                 ))}
               </select>

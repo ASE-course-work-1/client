@@ -12,7 +12,7 @@ export default function OutletDashboard() {
         const fetchOutletData = async () => {
             try {
                 // Replace with your actual endpoint for outlet data
-                const response = await axios.get("http://your-api-url/api/outlet/dashboard", {
+                const response = await axios.get("http://localhost:5003/api/outlet/dashboard", {
                     headers: {
                         Authorization: `Bearer ${JSON.parse(localStorage.getItem("user")).token}`,
                     },
@@ -32,7 +32,7 @@ export default function OutletDashboard() {
         try {
             // Call your API to update outlet data
             const response = await axios.put(
-                `http://your-api-url/api/outlet/${outletData.id}`,
+                `http://localhost:5003/api/outlet/${outletData.id}`,
                 updatedOutlet,
                 {
                     headers: {
@@ -50,7 +50,7 @@ export default function OutletDashboard() {
     const handleDeleteOutlet = async () => {
         try {
             // Call your API to delete the outlet
-            await axios.delete(`http://your-api-url/api/outlet/${outletData.id}`, {
+            await axios.delete(`http://localhost:5003/api/outlet/${outletData.id}`, {
                 headers: {
                     Authorization: `Bearer ${JSON.parse(localStorage.getItem("user")).token}`,
                 },

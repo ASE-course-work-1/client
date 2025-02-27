@@ -20,7 +20,7 @@ const CreateOutlet = () => {
     setSuccess("");
     try {
       await axios.post(
-        "/api/outlets",
+        "http://localhost:5003/api/outlets",
         {
           name,
           location,

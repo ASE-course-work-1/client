@@ -16,7 +16,7 @@ const OrderTracking = () => {
     setOrderStatus(null);
 
     try {
-      const response = await axios.get(`/api/requests/status/${token}`, {
+      const response = await axios.get(`http://localhost:5003/api/requests/status/${token}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },

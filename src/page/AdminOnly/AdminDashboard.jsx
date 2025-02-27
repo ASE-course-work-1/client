@@ -16,7 +16,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchOutlets = async () => {
       try {
-        const response = await axios.get("/api/outlets", {
+        const response = await axios.get("http://localhost:5003/api/outlets", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
         return;
       }
       try {
-        const response = await axios.get(`/api/stock/${selectedOutletId}`, {
+        const response = await axios.get(`http://localhost:5003/api/stock/${selectedOutletId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
     setSuccess("");
     try {
       await axios.put(
-        `/api/stock/${selectedOutletId}`,
+        `http://localhost:5003/api/stock/${selectedOutletId}`,
         { stock: Number(newStock) },
         {
           headers: {
@@ -74,7 +74,7 @@ const AdminDashboard = () => {
       );
       setSuccess("Stock updated successfully!");
       // Refresh stock after update
-      const response = await axios.get(`/api/stock/${selectedOutletId}`, {
+      const response = await axios.get(`http://localhost:5003/api/stock/${selectedOutletId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },

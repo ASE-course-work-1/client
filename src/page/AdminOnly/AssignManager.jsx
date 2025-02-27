@@ -13,19 +13,16 @@ const AssignManager = () => {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    // Fetch outlets from API
+    // Fetch outlets that do not have a manager assigned
     const fetchOutlets = async () => {
       try {
-        const response = await axios.get("/api/outlets", {
+        const response = await axios.get("http://localhost:5003/api/outlets/noManagers", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
-        // If response.data is not an array, try checking for a property like 'outlets'
-        const outletsData = Array.isArray(response.data)
-          ? response.data
-          : response.data.outlets || [];
-        setOutlets(outletsData);
+        // Assuming the response is an array as shown in the output
+        setOutlets(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
         console.error("Error fetching outlets:", err);
       }
@@ -34,12 +31,11 @@ const AssignManager = () => {
     // Fetch managers from API
     const fetchManagers = async () => {
       try {
-        const response = await axios.get("/api/outlets/managers", {
+        const response = await axios.get("http://localhost:5003/api/outlets/managers", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
-        // Similar check if response.data is an array
         const managersData = Array.isArray(response.data)
           ? response.data
           : response.data.managers || [];
@@ -65,7 +61,7 @@ const AssignManager = () => {
 
     try {
       await axios.put(
-        `/api/outlets/${selectedOutletId}/manager`,
+        `http://localhost:5003/api/outlets/${selectedOutletId}/manager`,
         { managerId: selectedManagerId },
         {
           headers: {
@@ -103,8 +99,8 @@ const AssignManager = () => {
             >
               <option value="">Select Outlet</option>
               {outlets.map((outlet) => (
-                <option key={outlet.id} value={outlet.id}>
-                  {outlet.name}
+                <option key={outlet._id} value={outlet._id}>
+                  {outlet.name} - {outlet.location}
                 </option>
               ))}
             </select>
@@ -122,7 +118,7 @@ const AssignManager = () => {
             >
               <option value="">Select Manager</option>
               {managers.map((manager) => (
-                <option key={manager.id} value={manager.id}>
+                <option key={manager.id || manager._id} value={manager.id || manager._id}>
                   {manager.name}
                 </option>
               ))}

@@ -11,7 +11,7 @@ export default function AdminPanel() {
         const fetchUsers = async () => {
             try {
                 // Replace with your actual admin API endpoint
-                const response = await axios.get("http://your-api-url/api/admin/users", {
+                const response = await axios.get("http://localhost:5003/api/admin/users", {
                     headers: {
                         Authorization: `Bearer ${JSON.parse(localStorage.getItem("user")).token}`,
                     },

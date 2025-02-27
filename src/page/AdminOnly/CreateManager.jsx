@@ -21,7 +21,7 @@ const CreateManager = () => {
 
     try {
       await axios.post(
-        "/api/outlets/managers",
+        "http://localhost:5003/api/outlets/managers",
         {
           name,
           email,
