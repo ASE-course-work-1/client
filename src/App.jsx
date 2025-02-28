@@ -15,7 +15,10 @@ import CreateManager from "./page/AdminOnly/CreateManager";
 import AssignManager from "./page/AdminOnly/AssignManager";
 import AdminDashboard from "./page/AdminOnly/AdminDashboard";
 
-
+//Outlet Page OutletDashboard
+import OutletDashboard from "./page/OutletManager/ManageStock";
+import Managedelivery from "./page/OutletManager/ManageDeliveries";
+import Managelists from "./page/OutletManager/ManageLists";
 function App() {
   return (
     <div>
@@ -33,6 +36,11 @@ function App() {
         <Route path="/admin/createmanager" element={<CreateManager />} />
         <Route path="/admin/assignmanager" element={<AssignManager />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+        {/* Outlet routes */}
+        <Route path="/outlet/managestock" element={<OutletDashboard />} />
+        <Route path="/outlet/managedelivery" element={<Managedelivery />} />
+        <Route path="/outlet/managelist" element={<Managelists />} />
       </Routes>
     </div>
   );

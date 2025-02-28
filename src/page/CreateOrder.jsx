@@ -1,4 +1,3 @@
-// src/page/CreateOrder.jsx
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import axios from "axios";
@@ -12,23 +11,13 @@ const CreateOrder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [orderDetails, setOrderDetails] = useState(null);
 
-  // Fetch available outlets on component mount
   useEffect(() => {
     const fetchOutlets = async () => {
       setLoadingOutlets(true);
       try {
         const response = await axios.get("http://localhost:5003/api/outlets/public");
-        // Expected response is an array of outlet objects:
-        // [
-        //   {
-        //     "_id": "67c085eed879081f8c272b27",
-        //     "name": "Branch1",
-        //     "location": "Matara",
-        //     "district": "Matara",
-        //     "contact": "04122565689"
-        //   }
-        // ]
         setOutlets(response.data);
       } catch (err) {
         console.error("Error fetching outlets:", err);
@@ -40,30 +29,24 @@ const CreateOrder = () => {
     fetchOutlets();
   }, []);
 
-  // Handle form submission
   const handleCreateOrder = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
     setSuccess("");
+    setOrderDetails(null);
 
     try {
-      // Request body includes the selected outlet's _id and values from text boxes
       const response = await axios.post(
         "http://localhost:5003/api/requests",
+        { outletId, quantity, address },
         {
-          outletId,
-          quantity,
-          address,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
+          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
         }
       );
 
       setSuccess("Order created successfully!");
+      setOrderDetails(response.data);
       setOutletId("");
       setQuantity(1);
       setAddress("");
@@ -81,17 +64,27 @@ const CreateOrder = () => {
         {error && <div className="text-red-500 mb-4">{error}</div>}
         {success && <div className="text-green-500 mb-4">{success}</div>}
 
+        {orderDetails && (
+          <div className="p-4 border rounded-lg bg-gray-100 mb-4">
+            <h3 className="font-semibold text-lg">Order Details:</h3>
+            <p><strong>Consumer ID:</strong> {orderDetails.consumerId}</p>
+            <p><strong>Outlet ID:</strong> {orderDetails.outletId}</p>
+            <p><strong>Status:</strong> {orderDetails.status}</p>
+            <p><strong>Token:</strong> {orderDetails.token}</p>
+            <p><strong>Quantity:</strong> {orderDetails.quantity}</p>
+            <p><strong>Address:</strong> {orderDetails.address}</p>
+            <p><strong>Created At:</strong> {new Date(orderDetails.createdAt).toLocaleString()}</p>
+          </div>
+        )}
+
         <form onSubmit={handleCreateOrder} className="space-y-4">
           <div className="flex flex-col">
-            <label htmlFor="outletId" className="font-semibold text-lg">
-              Select Outlet
-            </label>
+            <label htmlFor="outletId" className="font-semibold text-lg">Select Outlet</label>
             {loadingOutlets ? (
               <p>Loading outlets...</p>
             ) : (
               <select
                 id="outletId"
-                name="outletId"
                 value={outletId}
                 onChange={(e) => setOutletId(e.target.value)}
                 className="px-4 py-2 border rounded-lg"
@@ -108,13 +101,10 @@ const CreateOrder = () => {
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="quantity" className="font-semibold text-lg">
-              Quantity
-            </label>
+            <label htmlFor="quantity" className="font-semibold text-lg">Quantity</label>
             <input
               type="number"
               id="quantity"
-              name="quantity"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
               className="px-4 py-2 border rounded-lg"
@@ -124,13 +114,10 @@ const CreateOrder = () => {
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="address" className="font-semibold text-lg">
-              Delivery Address
-            </label>
+            <label htmlFor="address" className="font-semibold text-lg">Delivery Address</label>
             <input
               type="text"
               id="address"
-              name="address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className="px-4 py-2 border rounded-lg"

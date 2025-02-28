@@ -70,14 +70,10 @@ const ManageStock = () => {
     setSuccess("");
 
     try {
-      await axios.put(
+      await axios.post(
         `http://localhost:5003/api/stock/${selectedOutletId}`,
         { stock: Number(newStock) },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
       );
       setSuccess("Stock updated successfully!");
       setCurrentStock(Number(newStock));

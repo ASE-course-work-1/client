@@ -31,7 +31,7 @@ const AssignManager = () => {
     // Fetch managers from API
     const fetchManagers = async () => {
       try {
-        const response = await axios.get("http://localhost:5003/api/outlets/managers", {
+        const response = await axios.get("http://localhost:5003/api/admin/users?role=outlet_manager", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },

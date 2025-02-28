@@ -25,12 +25,22 @@ const DashboardLayout = ({ title, children }) => {
           { to: "/admin/createoutlet", label: "Create Outlet" },
           { to: "/admin/createmanager", label: "Create Manager" },
           { to: "/admin/assignmanager", label: "Assign Manager" },
+          { to: "/outlet/managestock", label: "Manage Stock" },
           // { to: "/admin/stock", label: "Manage Stock" },
+        ]
+      : [];
+      const managerNavLinks =
+    role === "outlet_manager"
+      ? [
+          { to: "/dashboard", label: "Dashboard" },
+          { to: "/outlet/managedelivery", label: "Manage Order" },
+          { to: "/ordertracking", label: "Order Tracking" },
+          { to: "/outlet/managelist", label: "Manage Lists" },
         ]
       : [];
 
   const navLinks =
-    role === "consumer" ? consumerNavLinks : role === "admin" ? adminNavLinks : [];
+    role === "consumer" ? consumerNavLinks : role === "admin" ? adminNavLinks : role === "outlet_manager"? managerNavLinks:[];
 
   const navigate = useNavigate();
   const handleLogout = () => {
