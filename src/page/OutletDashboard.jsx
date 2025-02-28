@@ -11,11 +11,10 @@ export default function OutletDashboard() {
     useEffect(() => {
         const fetchOutletData = async () => {
             try {
-                // Replace with your actual endpoint for outlet data
                 const response = await axios.get("http://localhost:5003/api/outlet/dashboard", {
                     headers: {
-                        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user")).token}`,
-                    },
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                      },
                 });
                 setOutletData(response.data);
                 setLoading(false);

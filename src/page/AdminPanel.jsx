@@ -13,12 +13,23 @@ export default function AdminPanel() {
                 // Replace with your actual admin API endpoint
                 const response = await axios.get("http://localhost:5003/api/admin/users", {
                     headers: {
-                        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user")).token}`,
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
                     },
                 });
-                setUsers(response.data.users);
+                setUsers(response.data); 
             } catch (err) {
                 setError("Error fetching users.");
+                // Fallback dummy data in case of an error
+                setUsers([
+                    { 
+                        _id: "67c08617d879081f8c272b2c", 
+                        name: "dil", 
+                        email: "manager1@gasbygas.com", 
+                        phone: "0712345678", 
+                        nic: "9788885124V", 
+                        role: "outlet_manager" 
+                    },
+                ]);
             }
         };
 
@@ -36,12 +47,18 @@ export default function AdminPanel() {
                 ) : (
                     <ul>
                         {users.map((user) => (
-                            <li key={user.userID} className="mb-2 p-4 bg-white rounded shadow">
+                            <li key={user._id} className="mb-2 p-4 bg-white rounded shadow">
                                 <p>
                                     <strong>Name:</strong> {user.name}
                                 </p>
                                 <p>
                                     <strong>Email:</strong> {user.email}
+                                </p>
+                                <p>
+                                    <strong>Phone:</strong> {user.phone}
+                                </p>
+                                <p>
+                                    <strong>NIC:</strong> {user.nic}
                                 </p>
                                 <p>
                                     <strong>Role:</strong> {user.role}
