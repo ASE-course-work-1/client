@@ -9,21 +9,33 @@ const ManageDeliveries = () => {
   const [selectedOutletId, setSelectedOutletId] = useState("");
   const [selectedOutlet, setSelectedOutlet] = useState(null);
   const [deliveries, setDeliveries] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [scheduledDate, setScheduledDate] = useState("");
   const [requestId, setRequestId] = useState("");
   const [loadingOutlets, setLoadingOutlets] = useState(false);
   const [loadingDeliveries, setLoadingDeliveries] = useState(false);
+  const [loadingRequests, setLoadingRequests] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // For schedule/update actions
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Fetch all outlets on mount
+  // Fetch all outlets on mount and filter by logged-in manager
   useEffect(() => {
     const fetchOutlets = async () => {
       setLoadingOutlets(true);
       try {
-        const response = await axios.get("http://localhost:5003/api/outlets/public");
-        setOutlets(Array.isArray(response.data) ? response.data : []);
+        const response = await axios.get("http://localhost:5003/api/outlets/all");
+        const allOutlets = Array.isArray(response.data) ? response.data : [];
+  
+        // Get logged-in manager ID from local storage
+        const loggedUserId = localStorage.getItem("Userid");
+  
+        // Filter outlets managed by the logged-in user
+        const filteredOutlets = allOutlets.filter(
+          (outlet) => outlet.manager && outlet.manager._id === loggedUserId
+        );
+  
+        setOutlets(filteredOutlets);
       } catch (err) {
         console.error("Error fetching outlets:", err);
         setError("Failed to fetch outlets.");
@@ -31,11 +43,11 @@ const ManageDeliveries = () => {
         setLoadingOutlets(false);
       }
     };
-
+  
     fetchOutlets();
   }, []);
 
-  // When an outlet is selected, update outlet details and fetch its deliveries
+  // When an outlet is selected, update details and fetch its deliveries
   useEffect(() => {
     if (selectedOutletId) {
       const outlet = outlets.find((o) => o._id === selectedOutletId);
@@ -65,11 +77,35 @@ const ManageDeliveries = () => {
     }
   }, [selectedOutletId, outlets]);
 
+  // Fetch requests for the selected outlet
+  useEffect(() => {
+    if (selectedOutletId) {
+      const fetchRequests = async () => {
+        setLoadingRequests(true);
+        try {
+          const response = await axios.get(`http://localhost:5003/api/requests/outlet/${selectedOutletId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          });
+          setRequests(Array.isArray(response.data) ? response.data : []);
+        } catch (err) {
+          console.error("Error fetching requests:", err);
+        } finally {
+          setLoadingRequests(false);
+        }
+      };
+      fetchRequests();
+    } else {
+      setRequests([]);
+    }
+  }, [selectedOutletId]);
+
   // Schedule a new delivery
   const handleScheduleDelivery = async (e) => {
     e.preventDefault();
     if (!selectedOutletId || !scheduledDate || !requestId) {
-      setError("Please select an outlet, set a scheduled date, and provide a request ID.");
+      setError("Please select an outlet, set a scheduled date, and select a request.");
       return;
     }
     setIsLoading(true);
@@ -207,7 +243,8 @@ const ManageDeliveries = () => {
               <span className="font-semibold">District:</span> {selectedOutlet.district}
             </p>
             <p>
-              <span className="font-semibold">Manager:</span> {selectedOutlet.manager ? selectedOutlet.manager.name : "Not assigned"}
+              <span className="font-semibold">Manager:</span>{" "}
+              {selectedOutlet.manager ? selectedOutlet.manager.name : "Not assigned"}
             </p>
             <p>
               <span className="font-semibold">Contact:</span> {selectedOutlet.contact}
@@ -235,17 +272,38 @@ const ManageDeliveries = () => {
               </div>
               <div>
                 <label htmlFor="requestId" className="block font-medium mb-2">
-                  Request ID
+                  Select Request
                 </label>
-                <input
-                  id="requestId"
-                  type="text"
-                  placeholder="Enter request ID"
-                  value={requestId}
-                  onChange={(e) => setRequestId(e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                  required
-                />
+                {loadingRequests ? (
+                  <p>Loading requests...</p>
+                ) : requests.length === 0 ? (
+                  <p>No requests available for this outlet.</p>
+                ) : (
+                  <div className="max-h-40 overflow-y-auto border rounded-md p-2">
+                    {requests.map((req) => (
+                      <div
+                        key={req._id}
+                        onClick={() => setRequestId(req._id)}
+                        className={`p-2 border-b cursor-pointer ${
+                          requestId === req._id ? "bg-blue-100" : ""
+                        }`}
+                      >
+                        <p>
+                          <span className="font-medium">Token:</span> {req.token}
+                        </p>
+                        <p>
+                          <span className="font-medium">Quantity:</span> {req.quantity}
+                        </p>
+                        <p>
+                          <span className="font-medium">User:</span> {req.consumerId?.name}
+                        </p>
+                        <p>
+                          <span className="font-medium">Phone:</span> {req.consumerId?.phone}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <button
                 type="submit"
@@ -269,8 +327,12 @@ const ManageDeliveries = () => {
             <div className="space-y-4">
               {deliveries.map((delivery) => (
                 <div key={delivery._id} className="border p-4 rounded-md">
-                  <p><strong>Delivery ID:</strong> {delivery._id}</p>
-                  <p><strong>Status:</strong> {delivery.status}</p>
+                  <p>
+                    <strong>Delivery ID:</strong> {delivery._id}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {delivery.status}
+                  </p>
                   <p>
                     <strong>Scheduled For:</strong>{" "}
                     {format(new Date(delivery.scheduledDate), "PPP p")}

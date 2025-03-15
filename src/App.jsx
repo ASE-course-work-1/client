@@ -19,6 +19,7 @@ import AdminDashboard from "./page/AdminOnly/AdminDashboard";
 import OutletDashboard from "./page/OutletManager/ManageStock";
 import Managedelivery from "./page/OutletManager/ManageDeliveries";
 import Managelists from "./page/OutletManager/ManageLists";
+import ManageStatus from "./page/OutletManager/ManageScheduledRequests";
 function App() {
   return (
     <div>
@@ -41,6 +42,7 @@ function App() {
         <Route path="/outlet/managestock" element={<OutletDashboard />} />
         <Route path="/outlet/managedelivery" element={<Managedelivery />} />
         <Route path="/outlet/managelist" element={<Managelists />} />
+        <Route path="/outlet/managestatus" element={<ManageStatus />} />
       </Routes>
     </div>
   );

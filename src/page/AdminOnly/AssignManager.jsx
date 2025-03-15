@@ -1,4 +1,3 @@
-// src/page/AdminOnly/AssignManager.jsx
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../components/DashboardLayout";
 import axios from "axios";
@@ -13,33 +12,27 @@ const AssignManager = () => {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    // Fetch outlets that do not have a manager assigned
     const fetchOutlets = async () => {
       try {
-        const response = await axios.get("http://localhost:5003/api/outlets/noManagers", {
+        const response = await axios.get("http://localhost:5003/api/outlets/unassigned", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
-        // Assuming the response is an array as shown in the output
         setOutlets(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
         console.error("Error fetching outlets:", err);
       }
     };
 
-    // Fetch managers from API
     const fetchManagers = async () => {
       try {
-        const response = await axios.get("http://localhost:5003/api/admin/users?role=outlet_manager", {
+        const response = await axios.get("http://localhost:5003/api/outlets/managers/unassigned", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
-        const managersData = Array.isArray(response.data)
-          ? response.data
-          : response.data.managers || [];
-        setManagers(managersData);
+        setManagers(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
         console.error("Error fetching managers:", err);
       }
@@ -70,8 +63,9 @@ const AssignManager = () => {
         }
       );
       setSuccess("Manager assigned successfully!");
-      setSelectedOutletId("");
-      setSelectedManagerId("");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err) {
       console.error("Error assigning manager:", err);
       setError("Failed to assign manager. Please try again.");
@@ -118,7 +112,7 @@ const AssignManager = () => {
             >
               <option value="">Select Manager</option>
               {managers.map((manager) => (
-                <option key={manager.id || manager._id} value={manager.id || manager._id}>
+                <option key={manager._id} value={manager._id}>
                   {manager.name}
                 </option>
               ))}

@@ -16,16 +16,44 @@ const OrderTracking = () => {
     setOrderStatus(null);
 
     try {
-      const response = await axios.get(`http://localhost:5003/api/requests/status/${token}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      });
+      const response = await axios.get(
+        `http://localhost:5003/api/requests/status/${token}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
       // Assume the response contains an object with a "status" property
       setOrderStatus(response.data);
     } catch (err) {
       console.error("Error tracking order:", err);
       setError("Failed to track order. Please check the token and try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // New function to confirm delivery using the provided API endpoint.
+  const handleConfirmDelivery = async () => {
+    if (!orderStatus || !orderStatus._id) return;
+    setIsLoading(true);
+    setError("");
+    try {
+      const response = await axios.post(
+        `http://localhost:5003/api/stock/confirm/${orderStatus._id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+      // Optionally update the orderStatus with the response data if needed.
+      setOrderStatus(response.data);
+    } catch (err) {
+      console.error("Error confirming delivery:", err);
+      setError("Failed to confirm delivery. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +94,13 @@ const OrderTracking = () => {
             <h3 className="text-xl font-bold mb-2">Order Status</h3>
             <p className="text-gray-700">{orderStatus.status}</p>
             {/* Display additional details if available */}
+            <button
+              onClick={handleConfirmDelivery}
+              disabled={isLoading}
+              className="mt-4 w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-300"
+            >
+              {isLoading ? "Confirming Delivery..." : "Confirm Delivery"}
+            </button>
           </div>
         )}
       </div>

@@ -26,6 +26,7 @@ const DashboardLayout = ({ title, children }) => {
           { to: "/admin/createmanager", label: "Create Manager" },
           { to: "/admin/assignmanager", label: "Assign Manager" },
           { to: "/outlet/managestock", label: "Manage Stock" },
+          { to: "/outlet/managelist", label: "Manage Lists" },
           // { to: "/admin/stock", label: "Manage Stock" },
         ]
       : [];
@@ -35,7 +36,7 @@ const DashboardLayout = ({ title, children }) => {
           { to: "/dashboard", label: "Dashboard" },
           { to: "/outlet/managedelivery", label: "Manage Order" },
           { to: "/ordertracking", label: "Order Tracking" },
-          { to: "/outlet/managelist", label: "Manage Lists" },
+          { to: "/outlet/managestatus", label: "Manage Sheduled Requests" },
         ]
       : [];
 
