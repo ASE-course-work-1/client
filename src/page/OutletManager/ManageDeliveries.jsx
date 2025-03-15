@@ -113,7 +113,7 @@ const ManageDeliveries = () => {
     setSuccess("");
     try {
       await axios.post(
-        "http://localhost:5003/api/deliveries",
+        "http://localhost:5003/api/stock/deliveries",
         { outletId: selectedOutletId, scheduledDate, requestId },
         {
           headers: {
@@ -123,7 +123,7 @@ const ManageDeliveries = () => {
       );
       setSuccess("Delivery scheduled successfully!");
       // Refresh deliveries list
-      const response = await axios.get(`http://localhost:5003/api/deliveries/${selectedOutletId}`, {
+      const response = await axios.get(`http://localhost:5003/api/stock/schedule/${selectedOutletId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },

@@ -107,6 +107,44 @@ const ManageScheduledRequests = () => {
     }
   };
 
+  // Handler to confirm delivery for a request
+  const handleConfirmDelivery = async (requestId) => {
+    const confirmed = window.confirm("Are you sure you want to confirm this delivery?");
+    if (!confirmed) return;
+
+    setIsUpdating(true);
+    setError("");
+    setSuccess("");
+    try {
+      await axios.post(
+        `http://localhost:5003/api/stock/confirm/${requestId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+      setSuccess("Delivery confirmed successfully!");
+      // Refresh the list of requests
+      const response = await axios.get("http://localhost:5003/api/requests/all", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      const allRequests = Array.isArray(response.data) ? response.data : [];
+      const filteredRequests = allRequests.filter(
+        (req) => req.outletId && req.outletId.name === selectedOutlet.name
+      );
+      setRequests(filteredRequests);
+    } catch (err) {
+      console.error("Error confirming delivery:", err);
+      setError("Failed to confirm delivery.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // Define your status options (customize as needed)
   const statusOptions = ["pending", "processing", "delivered", "cancelled"];
 
@@ -126,7 +164,8 @@ const ManageScheduledRequests = () => {
             {requests.length === 0 ? (
               <p>No scheduled requests found.</p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              // Add a scrollable container with a maximum height for the grid of request cards
+              <div className="overflow-y-auto max-h-[500px] grid grid-cols-1 md:grid-cols-2 gap-4">
                 {requests.map((req) => (
                   <div key={req._id} className="border p-4 rounded-lg">
                     <p>
@@ -168,6 +207,15 @@ const ManageScheduledRequests = () => {
                         ))}
                       </select>
                     </div>
+                    {req.status === "delivered" && (
+                      <button
+                        onClick={() => handleConfirmDelivery(req._id)}
+                        disabled={isUpdating}
+                        className="mt-2 w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-300"
+                      >
+                        {isUpdating ? "Confirming..." : "Confirm Delivery"}
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
